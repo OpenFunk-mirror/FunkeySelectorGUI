@@ -34,7 +34,7 @@ jobs:
         uses: NuGet/setup-nuget@v3
 
       - name: Install .NET Framework v4.0 SDK
-        run: choco install visualstudio2019buildtools --package-parameters "--add Microsoft.Net.Component.4.0.TargetingPack"
+        run: choco install visualstudio2019buildtools --package-parameters "--allWorkloads --includeRecommended --includeOptional --passive --locale en-US"
       
       - name: Restore Packages
         run: nuget restore ${{ env.solutionFile }}
