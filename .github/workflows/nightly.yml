@@ -3,8 +3,8 @@ name: Nightly builds
 
 env:
   projectName: FunkeySelectorGUI
-  projectFolder: FunkeySelector
-  solutionFile: FunkeySelector.sln
+  projectFolder: FunkeySelectorGUI
+  solutionFile: FunkeySelectorGUI.sln
 
 on:
   workflow_dispatch:
