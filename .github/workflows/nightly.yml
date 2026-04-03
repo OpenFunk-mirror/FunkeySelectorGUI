@@ -36,14 +36,11 @@ jobs:
       - name: Restore Packages
         run: nuget restore ${{ env.solutionFile }}
 
-      - name: Install .NET Framework v4.0 SDK
+      - name: Install .NET Framework v4.0 reference assemblies
         run: |
           nuget install Microsoft.NETFramework.ReferenceAssemblies -Version 1.0.3
           nuget install Microsoft.NETFramework.ReferenceAssemblies.net40 -Version 1.0.3
 
-      - run: tree "C:\Users\runneradmin\.nuget\packages\microsoft.netframework.referenceassemblies.net40"
-      - run: tree "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework"
-      - run: |
           $net40path = "C:\Users\runneradmin\.nuget\packages\microsoft.netframework.referenceassemblies.net40\1.0.3\build\.NETFramework\v4.0"
           $net40dest = "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0"
           Copy-Item "$net40path\*" -Destination "$net40dest" -Recurse -Force
