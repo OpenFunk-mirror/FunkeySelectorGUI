@@ -32,9 +32,12 @@ jobs:
       
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v3
-      
+
       - name: Restore Packages
         run: nuget restore ${{ env.solutionFile }}
+
+      - name: Install .NET Framework v4.0 SDK
+        run: nuget install Microsoft.NETFramework.ReferenceAssemblies -Version 1.0.3
       
       - name: Get version from update.xml
         id: getVersion
