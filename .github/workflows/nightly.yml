@@ -20,8 +20,8 @@ on:
 jobs:
   build:
     strategy:
-      matrix:
-        configuration: [ Debug, Release ]
+      matrix: # removed Debug because I don't see a use for it + it would cause conflicts on the pre-release
+        configuration: [ Release ]
     runs-on: windows-latest
     steps:
       - name: Checkout repository
