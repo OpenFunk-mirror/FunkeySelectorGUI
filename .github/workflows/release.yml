@@ -73,7 +73,8 @@ jobs:
       - name: Upload the build results as an artifact
         uses: actions/upload-artifact@v7
         with:
-          path: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/*
+          archive: false
+          path: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/FunkeySelectorGUI.exe
           name: ${{ env.projectName }}.${{ github.event.release.tag_name }}.${{ matrix.configuration }}
       
       - name: Upload build results to release
