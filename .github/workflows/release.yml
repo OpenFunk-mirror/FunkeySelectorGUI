@@ -5,8 +5,8 @@ name: Publish release
 
 env:
   projectName: FunkeySelectorGUI
-  projectFolder: FunkeySelector
-  solutionFile: FunkeySelector.sln
+  projectFolder: FunkeySelectorGUI
+  solutionFile: FunkeySelectorGUI.sln
 
 on:
   release: 
@@ -79,13 +79,12 @@ jobs:
       - name: Upload build results to release
         uses: svenstaro/upload-release-action@v2
         with:
-          file: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/FunkeySelector.exe
-          asset_name: FunkeySelectorGUI.exe
+          file: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/FunkeySelectorGUI.exe
       
       - name: Get file size of FunkeySelectorGUI.exe
         id: filesize
         run: |
-          "FILESIZE=$((Get-Item ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/FunkeySelector.exe).length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "FILESIZE=$((Get-Item ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/FunkeySelectorGUI.exe).length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       
       - name: Update update.xml
         run: echo '<update version="${{ steps.version.outputs.value }}" name="${{ github.event.release.name }}" size="${{ steps.filesize.outputs.FILESIZE }}" url="https://github.com/GittyMac/FunkeySelectorGUI/releases/download/${{ github.event.release.tag_name }}/FunkeySelectorGUI.exe" />' > update.xml
