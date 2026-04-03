@@ -38,6 +38,9 @@ jobs:
       
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v3
+
+      - name: Install .NET Framework v4.0 SDK
+        run: choco install windows-sdk-7.1
       
       - name: Restore Packages
         run: nuget restore ${{ env.solutionFile }}
