@@ -69,8 +69,36 @@ jobs:
       - name: Build solution
         run: msbuild ${{ env.solutionFile }} -t:rebuild -property:Configuration=${{ matrix.configuration }}
       
+      - name: Get file size of ${{ env.projectFolder }}.exe
+        id: info
+        run: |
+          "FILESIZE=$((Get-Item ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe).length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "COMMIT_HASH=$(git log -1 --pretty=format:"%H")" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "SHORT_COMMIT_HASH=$(git log -1 --pretty=format:"%h")" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Generate update.xml
+        run: echo '<update version="${{ steps.info.outputs.COMMIT_HASH }}" name="${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}" size="${{ steps.info.outputs.FILESIZE }}" url="https://github.com/OpenFK-mirror/FunkeySelectorGUI/releases/download/nightly/${{ env.projectFolder }}.exe" />' > "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/update.xml"
+
       - name: Upload the build results as an artifact
         uses: actions/upload-artifact@v7
         with:
           path: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/*
           name: ${{ env.projectName }}.Nightly.${{ matrix.configuration }}
+
+      - name: Delete ${{ env.projectFolder }}.exe.config so
+        run: rm "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe.config"
+
+      - name: Upload build results to nightly builds release
+        uses: svenstaro/upload-release-action@v2
+        if: github.ref_name == 'main' && github.repository == 'OpenFunk/FunkeySelectorGUI'
+        with:
+          tag: nightly
+          overwrite: true
+          file_glob: true
+          file: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/*
+          body: |
+            Check the attached files for the latest nightly build.
+            Note that the source code and tag are NOT kept up to date!
+
+            Current build: `${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}`
+            Current full version: `${{ steps.info.outputs.COMMIT_HASH }}`
