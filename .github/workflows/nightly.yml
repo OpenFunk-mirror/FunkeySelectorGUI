@@ -46,7 +46,7 @@ jobs:
       - run: |
           $net40path = "C:\Users\runneradmin\.nuget\packages\microsoft.netframework.referenceassemblies.net40\1.0.3\build\.NETFramework\v4.0"
           $net40dest = "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0"
-          Copy-Item "$net40path\*" -Destination "$net40dest" -Recurse
+          Copy-Item "$net40path\*" -Destination "$net40dest" -Recurse -Force
       
       - name: Get version from update.xml
         id: getVersion
