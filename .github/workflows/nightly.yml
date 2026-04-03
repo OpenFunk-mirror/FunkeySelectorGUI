@@ -40,6 +40,10 @@ jobs:
         run: |
           nuget install Microsoft.NETFramework.ReferenceAssemblies -Version 1.0.3
           nuget install Microsoft.NETFramework.ReferenceAssemblies.net40 -Version 1.0.3
+
+      - run: tree "C:\Users\runneradmin\.nuget\packages\microsoft.netframework.referenceassemblies.net40"
+      - run: tree "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework"
+      #- run: Copy-Item 
       
       - name: Get version from update.xml
         id: getVersion
