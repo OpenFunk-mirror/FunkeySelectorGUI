@@ -34,7 +34,7 @@ jobs:
         uses: NuGet/setup-nuget@v3
 
       - name: Install .NET Framework v4.0 SDK
-        run: winget install -e --id Microsoft.DotNet.Framework.DeveloperPack_4 --version 4.0
+        run: winget install -e --id Microsoft.DotNet.Framework.DeveloperPack_4 --version 4.0 --silent --disable-interactivity
       
       - name: Restore Packages
         run: nuget restore ${{ env.solutionFile }}
