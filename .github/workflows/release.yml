@@ -21,10 +21,10 @@ jobs:
     strategy:
       matrix: # please please please don't put multiple build configurations in here, it will cause unintended behaviour
         configuration: [ Release ]
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: "${{ github.event.repository.default_branch }}"
       
@@ -34,10 +34,10 @@ jobs:
           git config user.email "<>"
       
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
       
       - name: Setup NuGet
-        uses: NuGet/setup-nuget@v2
+        uses: NuGet/setup-nuget@v3
       
       - name: Restore Packages
         run: nuget restore ${{ env.solutionFile }}
@@ -68,7 +68,7 @@ jobs:
         run: msbuild ${{ env.solutionFile }} -t:rebuild -property:Configuration=${{ matrix.configuration }}
       
       - name: Upload the build results as an artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           path: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/*
           name: ${{ env.projectName }}.${{ github.event.release.tag_name }}.${{ matrix.configuration }}
