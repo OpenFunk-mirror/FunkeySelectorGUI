@@ -87,7 +87,7 @@ jobs:
           path: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/*
           name: ${{ env.projectName }}.Nightly.${{ matrix.configuration }}
 
-      - name: Delete ${{ env.projectFolder }}.exe.config so
+      - name: Delete ${{ env.projectFolder }}.exe.config
         run: rm "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe.config"
 
       - name: Upload build results to nightly builds release
