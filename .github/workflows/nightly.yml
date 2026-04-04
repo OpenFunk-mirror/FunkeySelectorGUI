@@ -19,6 +19,8 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: write
     strategy:
       matrix: # removed Debug because I don't see a use for it + it would cause conflicts on the pre-release
         configuration: [ Release ]
