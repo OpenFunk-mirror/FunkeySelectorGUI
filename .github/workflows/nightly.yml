@@ -79,7 +79,7 @@ jobs:
           "SHORT_COMMIT_HASH=$(git log -1 --pretty=format:"%h")" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Generate update.xml
-        run: echo '<update version="${{ steps.info.outputs.COMMIT_HASH }}" name="${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}" size="${{ steps.info.outputs.FILESIZE }}" url="https://github.com/OpenFK-mirror/FunkeySelectorGUI/releases/download/nightly/${{ env.projectFolder }}.exe" />' > "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/update.xml"
+        run: echo '<update version="${{ steps.info.outputs.COMMIT_HASH }}" name="${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}" size="${{ steps.info.outputs.FILESIZE }}" url="https://github.com/OpenFunK-mirror/FunkeySelectorGUI/releases/download/nightly/${{ env.projectFolder }}.exe" />' > "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/update.xml"
 
       - name: Upload the build results as an artifact
         uses: actions/upload-artifact@v7
