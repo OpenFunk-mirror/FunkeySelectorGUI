@@ -13,6 +13,11 @@ on:
     types:
       - released
 
+concurrency:
+  group: ${{ github.workflow }}
+  # wouldn't want a previously running release workflow to push artifacts to the wrong release
+  cancel-in-progress: true
+
 jobs:
   publish:
     permissions:
