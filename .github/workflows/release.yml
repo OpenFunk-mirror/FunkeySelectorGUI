@@ -87,7 +87,7 @@ jobs:
           "FILESIZE=$((Get-Item '${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe').length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       
       - name: Update update.xml
-        run: echo '<update version="${{ steps.version.outputs.value }}" name="${{ github.event.release.name }}" size="${{ steps.filesize.outputs.FILESIZE }}" url="https://github.com/OpenFunk-mirror/FunkeySelectorGUI/releases/download/${{ github.event.release.tag_name }}/${{ env.projectFolder }}.exe" />' > update.xml
+        run: echo '<update version="${{ steps.normalizeVersion.outputs.value }}" name="${{ github.event.release.name }}" size="${{ steps.filesize.outputs.FILESIZE }}" url="https://github.com/OpenFunk-mirror/FunkeySelectorGUI/releases/download/${{ github.event.release.tag_name }}/${{ env.projectFolder }}.exe" />' > update.xml
       
       - name: Push the changes made to update.xml
         run: |
