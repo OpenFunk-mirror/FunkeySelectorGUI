@@ -38,13 +38,19 @@ jobs:
       
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v3
-
-      - name: Install .NET Framework v4.0 SDK
-        run: choco install windows-sdk-7.1
       
       - name: Restore Packages
         run: nuget restore ${{ env.solutionFile }}
       
+      - name: Install .NET Framework v4.0 reference assemblies
+        run: |
+          nuget install Microsoft.NETFramework.ReferenceAssemblies -Version 1.0.3
+          nuget install Microsoft.NETFramework.ReferenceAssemblies.net40 -Version 1.0.3
+
+          $net40path = "C:\Users\runneradmin\.nuget\packages\microsoft.netframework.referenceassemblies.net40\1.0.3\build\.NETFramework\v4.0"
+          $net40dest = "C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0"
+          Copy-Item "$net40path\*" -Destination "$net40dest" -Recurse -Force
+
       - name: Get version from release name
         id: getVersion
         uses: mad9000/actions-find-and-replace-string@5
