@@ -46,7 +46,7 @@ jobs:
         run: nuget restore ${{ env.solutionFile }}
       
       - name: Get version from release name
-        id: version
+        id: getVersion
         uses: mad9000/actions-find-and-replace-string@5
         with:
           source: "${{ github.event.release.tag_name }}"
@@ -56,7 +56,7 @@ jobs:
       - name: Normalize the version string into SemVer format (x.x.x)
         id: normalizeVersion
         run: |
-          $versionString = "${{ steps.version.outputs.value }}"
+          $versionString = "${{ steps.getVersion.outputs.value }}"
           $digits = $versionString.Split(".").Length
           if ($digits -eq 1) { $versionString += ".0.0" }
           elseif ($digits -eq 2) { $versionString += ".0" }
