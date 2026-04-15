@@ -102,7 +102,7 @@ jobs:
           file: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/*
           body: |
             Check the attached files for the latest nightly build.
-            Note that the source code and tag are NOT kept up to date!
+            Note that the source code download and the tag are NOT kept up to date!
 
             Current build: `${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}`
             Current full version: `${{ steps.info.outputs.COMMIT_HASH }}`
