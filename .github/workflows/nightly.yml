@@ -11,6 +11,7 @@ env:
   mainBranchName: fix-ci
   repoName: FunkeySelectorGUI
   repoOwner: OpenFunk-mirror
+  nightlyBuildsPreReleaseId: 309119301
 
 on:
   workflow_dispatch:
@@ -112,6 +113,7 @@ jobs:
         if: github.ref_name == env.mainBranchName && github.repository == '${{ env.repoOwner }}/${{ env.repoName }}'
         with:
           tag: nightly
+          release_id: ${{ env.nightlyBuildsPreReleaseId }}
           prerelease: true
           draft: false
           overwrite: true
