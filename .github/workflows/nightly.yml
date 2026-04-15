@@ -104,5 +104,5 @@ jobs:
             Check the attached files for the latest nightly build.
             Note that the source code download and the tag are NOT kept up to date!
 
-            Current build: `${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}`
-            Current full version: `${{ steps.info.outputs.COMMIT_HASH }}`
+            Current build name: `${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}`
+            Current version: `${{ steps.info.outputs.COMMIT_HASH }}`
