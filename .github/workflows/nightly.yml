@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload build results to nightly builds release
         uses: svenstaro/upload-release-action@v2
-        if: github.ref_name == 'main' && github.repository == 'OpenFunk/FunkeySelectorGUI'
+        if: github.ref_name == 'fix-ci' && github.repository == 'OpenFunk/FunkeySelectorGUI'
         with:
           tag: nightly
           prerelease: true
