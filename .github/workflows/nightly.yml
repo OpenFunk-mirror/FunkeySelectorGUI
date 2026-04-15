@@ -101,7 +101,7 @@ jobs:
           cd "${{ env.projectFolder }}/bin/${{ matrix.configuration }}"
           tar -cJf FunkeySelectorGUI.tar.xz *
 
-      - name: Upload build results to nightly builds release
+      - name: Upload build results to nightly builds prerelease
         uses: svenstaro/upload-release-action@v2
         if: github.ref_name == 'fix-ci' && github.repository == 'OpenFunk-mirror/FunkeySelectorGUI'
         with:
