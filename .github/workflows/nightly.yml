@@ -99,7 +99,7 @@ jobs:
         # xz compresses better here
         run: |
           cd "${{ env.projectFolder }}/bin/${{ matrix.configuration }}"
-          tar -cJf FunkeySelectorGUI.tar.xz *
+          tar -cJf FunkeySelectorGUI.Debug.tar.xz *
 
       - name: Upload build results to nightly builds prerelease
         uses: svenstaro/upload-release-action@v2
