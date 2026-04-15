@@ -8,8 +8,8 @@ env:
   solutionFile: FunkeySelectorGUI.sln
 
   # Repo details
-  mainBranchName: fix-ci
   githubRepository: OpenFunk-mirror/FunkeySelectorGUI
+  mainBranchName: fix-ci
   nightlyBuildsPreReleaseId: 309119301
 
 on:
