@@ -2,9 +2,15 @@
 name: Nightly builds
 
 env:
+  # Project details
   projectName: FunkeySelectorGUI
   projectFolder: FunkeySelectorGUI
   solutionFile: FunkeySelectorGUI.sln
+
+  # Repo details
+  mainBranchName: fix-ci
+  repoName: FunkeySelectorGUI
+  repoOwner: OpenFunk-mirror
 
 on:
   workflow_dispatch:
@@ -103,7 +109,7 @@ jobs:
 
       - name: Upload build results to nightly builds prerelease
         uses: svenstaro/upload-release-action@v2
-        if: github.ref_name == 'fix-ci' && github.repository == 'OpenFunk-mirror/FunkeySelectorGUI'
+        if: github.ref_name == env.mainBranchName && github.repository == '${{ env.repoOwner }}/${{ env.repoName }}'
         with:
           tag: nightly
           prerelease: true
