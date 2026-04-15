@@ -71,7 +71,7 @@ jobs:
       - name: Build solution
         run: msbuild ${{ env.solutionFile }} -t:rebuild -property:Configuration=${{ matrix.configuration }}
       
-      - name: Get file size of ${{ env.projectFolder }}.exe
+      - name: Set a bunch of variables
         id: info
         run: |
           "FILESIZE=$((Get-Item ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe).length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
