@@ -113,6 +113,7 @@ jobs:
         with:
           tag: nightly
           release_id: ${{ env.nightlyBuildsPreReleaseId }}
+          release_name: Latest nightly build
           prerelease: true
           draft: false
           overwrite: true
