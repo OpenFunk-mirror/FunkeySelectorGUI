@@ -10,7 +10,6 @@ env:
   # Repo details
   githubRepository: OpenFunk-mirror/FunkeySelectorGUI
   mainBranchName: fix-ci
-  nightlyBuildsPreReleaseId: 309119301
 
 on:
   workflow_dispatch:
@@ -108,19 +107,17 @@ jobs:
           tar -cJf FunkeySelectorGUI.Debug.tar.xz *
 
       - name: Upload build results to nightly builds prerelease
-        uses: svenstaro/upload-release-action@v2
+        uses: softprops/action-gh-release@v3
         if: github.ref_name == env.mainBranchName && github.repository == env.githubRepository
         with:
-          tag: nightly
-          release_id: ${{ env.nightlyBuildsPreReleaseId }}
-          release_name: Latest nightly build
+          tag_name: nightly
+          name: Latest nightly build
           prerelease: true
           draft: false
-          overwrite: true
-          file_glob: true
+          overwrite_files: true
           # Release build job uploads the update.xml and FunkeySelectorGUI.exe files
           # Debug build job uploads FunkeySelectorGUI.Debug.tar.xz
-          file: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ matrix.configuration == 'Release' && '*' || 'FunkeySelectorGUI.Debug.tar.xz' }}
+          files: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ matrix.configuration == 'Release' && '*' || 'FunkeySelectorGUI.Debug.tar.xz' }}
           # This step is ran multiple times in parallel so the body gets overwritten multiple times
           body: |
             Check the attached files for the latest nightly build.
