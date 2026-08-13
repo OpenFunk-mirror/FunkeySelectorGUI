@@ -125,8 +125,8 @@ jobs:
 
             Current build name: `${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}`
             Current version: `${{ steps.info.outputs.COMMIT_HASH }}`
-            Last updated: `${{ steps.info.outputs.LAST_COMMIT_DATE }}`
-            Built at: `${{ steps.info.outputs.BUILD_DATE }}`
+            Last updated: `${{ steps.info.outputs.LAST_COMMIT_TIMESTAMP }}`
+            Built at: `${{ steps.info.outputs.BUILD_TIMESTAMP }}`
 
             # Which file do I download?
             There are two files available for download: the regular version (FunkeySelectorGUI.exe) and the Debug version (FunkeySelectorGUI.Debug.tar.xz).
