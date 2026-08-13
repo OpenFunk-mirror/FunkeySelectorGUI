@@ -75,9 +75,7 @@ jobs:
           version: "${{ steps.normalizeVersion.outputs.VERSION }}"
       
       - name: Build solution
-        run: |
-          msbuild ${{ env.solutionFile }} -t:"${{ matrix.configuration == 'Release' && 'clean;' || '' }}rebuild" -property:Configuration=${{ matrix.configuration }}
-          ls "${{ env.projectFolder }}/bin/${{ matrix.configuration }}"
+        run: msbuild ${{ env.solutionFile }} -t:"${{ matrix.configuration == 'Release' && 'clean;' || '' }}rebuild" -property:Configuration=${{ matrix.configuration }}
       
       - name: Set a bunch of variables
         id: info
