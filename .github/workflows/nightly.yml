@@ -82,8 +82,8 @@ jobs:
           "FILESIZE=$((Get-Item ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe).length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "COMMIT_HASH=$(git log -1 --pretty=format:"%H")" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "SHORT_COMMIT_HASH=$(git log -1 --pretty=format:"%h")" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          'LAST_COMMIT_TIMESTAMP=$(Get-Date -Date "$(git log -1 --pretty=format:\"%aD\")" -Format "ddd, d MMM yyyy HH:mm:ss zzz")' | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          'BUILD_TIMESTAMP=$(Get-Date -Format "ddd, d MMM yyyy HH:mm:ss zzz")' | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "LAST_COMMIT_TIMESTAMP=$(Get-Date -Date "$(git log -1 --pretty=format:'%aD')" -Format 'ddd, d MMM yyyy HH:mm:ss zzz')" >> $env:GITHUB_OUTPUT
+          "BUILD_TIMESTAMP=$(Get-Date -Format "ddd, d MMM yyyy HH:mm:ss zzz")" >> $env:GITHUB_OUTPUT
 
       - name: Generate update.xml
         run: echo '<update version="${{ steps.info.outputs.COMMIT_HASH }}" name="${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}" size="${{ steps.info.outputs.FILESIZE }}" url="https://github.com/OpenFunK-mirror/FunkeySelectorGUI/releases/download/nightly/${{ env.projectFolder }}.exe" />' > "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/update.xml"
