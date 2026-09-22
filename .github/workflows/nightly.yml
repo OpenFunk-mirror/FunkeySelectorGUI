@@ -86,7 +86,7 @@ jobs:
           "BUILD_TIMESTAMP=$(Get-Date -Format "ddd, d MMM yyyy HH:mm:ss zzz")" >> $env:GITHUB_OUTPUT
 
       - name: Generate update.xml
-        run: echo '<update version="${{ steps.info.outputs.COMMIT_HASH }}" name="${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}" size="${{ steps.info.outputs.FILESIZE }}" url="https://github.com/OpenFunK-mirror/FunkeySelectorGUI/releases/download/nightly/${{ env.projectFolder }}.exe" />' > "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/update.xml"
+        run: echo '<update version="${{ steps.info.outputs.COMMIT_HASH }}" name="${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}" size="${{ steps.info.outputs.FILESIZE }}" url="https://github.com/${{ env.githubRepository }}/releases/download/nightly/${{ env.projectFolder }}.exe" />' > "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/update.xml"
 
       - name: Upload the build results as an artifact
         uses: actions/upload-artifact@v7
