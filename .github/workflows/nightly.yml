@@ -98,9 +98,7 @@ jobs:
       - name: Put the build artifacts into an archive file
         if: matrix.configuration == 'Debug'
         # xz compresses better here
-        run: |
-          cd "${{ env.projectFolder }}/bin/${{ matrix.configuration }}"
-          tar -cJf FunkeySelectorGUI.Debug.tar.xz *
+        run: tar -cJf FunkeySelectorGUI.Debug.tar.xz "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/*"
 
       - name: Upload the build results to the nightly builds prerelease
         env:
