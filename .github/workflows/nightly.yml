@@ -93,7 +93,7 @@ jobs:
       # We don't upload the .exe.config in Release builds because we consider those clean builds which should have as little clutter as possible
       - name: Copy the build result for easier access
         if: matrix.configuration == 'Release'
-        run: mv "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe ."
+        run: mv "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe" .
 
       - name: Put the build artifacts into an archive file
         if: matrix.configuration == 'Debug'
