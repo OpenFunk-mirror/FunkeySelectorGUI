@@ -9,6 +9,8 @@ env:
 
   # Repo details
   githubRepository: OpenFunk-mirror/FunkeySelectorGUI
+  codebergRepository: OpenFunk/FunkeySelectorGUI
+  codebergReleaseName: Latest nightly build
   mainBranchName: fix-ci
 
 on:
@@ -75,18 +77,6 @@ jobs:
 
       - name: Build solution
         run: msbuild ${{ env.solutionFile }} -t:"${{ matrix.configuration == 'Release' && 'clean;' || '' }}rebuild" -property:Configuration=${{ matrix.configuration }}
-      
-      - name: Set a bunch of variables
-        id: info
-        run: |
-          "FILESIZE=$((Get-Item ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ env.projectFolder }}.exe).length)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "COMMIT_HASH=$(git log -1 --pretty=format:"%H")" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "SHORT_COMMIT_HASH=$(git log -1 --pretty=format:"%h")" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "LAST_COMMIT_TIMESTAMP=$(Get-Date -Date "$(git log -1 --pretty=format:'%aD')" -Format 'ddd, d MMM yyyy HH:mm:ss zzz')" >> $env:GITHUB_OUTPUT
-          "BUILD_TIMESTAMP=$(Get-Date -Format "ddd, d MMM yyyy HH:mm:ss zzz")" >> $env:GITHUB_OUTPUT
-
-      - name: Generate update.xml
-        run: echo '<update version="${{ steps.info.outputs.COMMIT_HASH }}" name="${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}" size="${{ steps.info.outputs.FILESIZE }}" url="https://github.com/${{ env.githubRepository }}/releases/download/nightly/${{ env.projectFolder }}.exe" />' > "${{ env.projectFolder }}/bin/${{ matrix.configuration }}/update.xml"
 
       - name: Upload the build results as an artifact
         uses: actions/upload-artifact@v7
@@ -106,28 +96,95 @@ jobs:
           cd "${{ env.projectFolder }}/bin/${{ matrix.configuration }}"
           tar -cJf FunkeySelectorGUI.Debug.tar.xz *
 
-      - name: Upload build results to nightly builds prerelease
-        uses: softprops/action-gh-release@v3
-        if: github.ref_name == env.mainBranchName && github.repository == env.githubRepository
-        with:
-          tag_name: nightly
-          name: Latest nightly build
-          prerelease: true
-          draft: false
-          overwrite_files: true
-          # Release build job uploads the update.xml and FunkeySelectorGUI.exe files
-          # Debug build job uploads FunkeySelectorGUI.Debug.tar.xz
-          files: ${{ env.projectFolder }}/bin/${{ matrix.configuration }}/${{ matrix.configuration == 'Release' && '*' || 'FunkeySelectorGUI.Debug.tar.xz' }}
-          # This step is ran multiple times in parallel so the body gets overwritten multiple times
-          body: |
-            Check the attached files for the latest nightly build.
-            Note that the source code download and the tag are NOT kept up to date!
+      - name: Upload the build results to the nightly builds prerelease
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $result = "${{ env.projectName }}.${{ matrix.configuration == 'Release' && 'exe' || 'Debug.tar.xz' }}"
+          # assumes there already is an asset with the same name
+          gh release delete-asset nightly $result --yes
+          gh release upload nightly $result --repo ${{ env.githubRepository }}
+          ./fj release asset delete "${{ env.codebergReleaseName }}" $result -H codeberg.org -r ${{ env.codebergRepository }}
+          ./fj release asset create "${{ env.codebergReleaseName }}" $result -H codeberg.org -r ${{ env.codebergRepository }}
 
-            Current build name: `${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}`
-            Current version: `${{ steps.info.outputs.COMMIT_HASH }}`
-            Last updated: `${{ steps.info.outputs.LAST_COMMIT_TIMESTAMP }}`
-            Built at: `${{ steps.info.outputs.BUILD_TIMESTAMP }}`
 
-            # Which file do I download?
-            There are two files available for download: the regular version (FunkeySelectorGUI.exe) and the Debug version (FunkeySelectorGUI.Debug.tar.xz).
-            Unless you're planning to use a debugger program, you can disregard the Debug version. It's a pretty obscure usecase anyway, but I aim to serve all of em :)
+  finish:
+    needs:
+      - build
+    permissions:
+      contents: write
+    runs-on: ubuntu-slim
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup forgejo cli
+        shell: bash
+        run: |
+          curl -O https://codeberg.org/forgejo-contrib/forgejo-cli/releases/download/latest/forgejo-cli-x86_64-linux.tar.gz
+          tar -xf forgejo-cli-x86_64-linux.tar.gz
+          chmod +x fj
+          cp fj /usr/local/bin
+          echo "${{ secrets.CODEBERG_TOKEN }}" | fj -H codeberg.org auth add-token
+
+      - name: Set a bunch of variables
+        id: info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $filesizes = gh release view --repo ${{ env.githubRepository }} nightly --json assets --jq '[ .assets[] | {name:.name, size:.size} | select(.name | startswith("${{ env.projectName }}")) | {(.name):.size} | to_entries ] | flatten | from_entries' | ConvertFrom-Json
+          echo $filesizes
+          "FILESIZE_RELEASE=$($filesizes.'${{ env.projectName }}.exe')" >> $env:GITHUB_OUTPUT
+          "FILESIZE_DEBUG=$($filesizes.'${{ env.projectName }}.Debug.tar.xz')" >> $env:GITHUB_OUTPUT
+
+          "COMMIT_HASH=$(git log -1 --pretty=format:"%H")" >> $env:GITHUB_OUTPUT
+          "SHORT_COMMIT_HASH=$(git log -1 --pretty=format:"%h")" >> $env:GITHUB_OUTPUT
+          "LAST_COMMIT_TIMESTAMP=$(Get-Date -Date "$(git log -1 --pretty=format:'%aD')" -Format 'ddd, d MMM yyyy HH:mm:ss zzz')" >> $env:GITHUB_OUTPUT
+          "BUILD_TIMESTAMP=$(Get-Date -Format "ddd, d MMM yyyy HH:mm:ss zzz")" >> $env:GITHUB_OUTPUT
+
+      - name: Update update.xml and buld notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $content = @'
+          <?xml version="1.0" encoding="utf-8"?>
+          <update schema_version="2.0" id="funkeyselectorgui" name="FunkeySelectorGUI" version="${{ steps.info.outputs.COMMIT_HASH }}" version_name="FunkeySelectorGUI@${{ steps.info.outputs.SHORT_COMMIT_HASH }}">
+              <variant size="${{ steps.info.outputs.FILESIZE_RELEASE }}" link="https://github.com/${{ env.githubRepository }}/releases/download/nightly/${{ env.projectName }}.exe">
+                  <Property key="BuildConfiguration" value="Release" />
+              </variant>
+              <variant size="${{ steps.info.outputs.FILESIZE_DEBUG }}" link="https://github.com/${{ env.githubRepository }}/releases/download/nightly/${{ env.projectName }}.Debug.tar.xz">
+                  <Property key="BuildConfiguration" value="Debug" />
+              </variant>
+          </update>
+          '@
+          Set-Content -Path update.xml -Value $content -Encoding utf8
+          # assumes there already is an update.xml
+          gh release delete-asset nightly update.xml --yes
+          gh release upload nightly update.xml --repo ${{ env.githubRepository }}
+
+          $content = $content.Replace("github.com/${{ env.githubRepository }}", "codeberg.org/${{ env.codebergRepository }}")
+          Set-Content -Path update.xml -Value $content -Encoding utf8
+          # assumes there already is an update.xml
+          fj release asset delete "${{ env.codebergReleaseName }}" update.xml -H codeberg.org -r ${{ env.codebergRepository }}
+          fj release asset create "${{ env.codebergReleaseName }}" update.xml -H codeberg.org -r ${{ env.codebergRepository }}
+
+          $releaseNotes = @'
+          Check the attached files for the latest nightly build.
+          Note that the source code download and the tag are NOT kept up to date!
+
+          Current build name: `${{ env.projectName }}@${{ steps.info.outputs.SHORT_COMMIT_HASH }}`
+          Current version: `${{ steps.info.outputs.COMMIT_HASH }}`
+          Last updated: `${{ steps.info.outputs.LAST_COMMIT_TIMESTAMP }}`
+          Built at: `${{ steps.info.outputs.BUILD_TIMESTAMP }}`
+
+          # Which file do I download?
+          TLDR: `FunkeySelectorGUI.exe`.
+
+          There are two files available for download: the regular version (FunkeySelectorGUI.exe) and the Debug version (FunkeySelectorGUI.Debug.tar.xz).
+          Unless you're planning to use a debugger program, you can disregard the Debug version. It's a pretty obscure usecase anyway, but I aim to serve all of em :)
+          '@
+          $releaseNotes | gh release edit nightly --notes-file -
+          fj release edit -H codeberg.org -r ${{ env.codebergRepository }} -t nightly "${{ env.codebergReleaseName }}" -b $releaseNotes
